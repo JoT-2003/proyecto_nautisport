@@ -2,18 +2,13 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import api from '@/services/api';
+import { NS_TOKEN, NS_USUARIO, guardarSesion, limpiarSesion } from '@/lib/sesion';
 
-// Claves de sesión en localStorage
-export const NS_TOKEN = 'ns_token';
-export const NS_USUARIO = 'ns_usuario';
-
-export function limpiarSesion() {
-  localStorage.removeItem(NS_TOKEN);
-  localStorage.removeItem(NS_USUARIO);
-}
+// Reexportado por compatibilidad con imports antiguos.
+export { NS_TOKEN, NS_USUARIO, limpiarSesion };
 
 /**
- * Hook de sesión: valida el token contra el backend (GET /auth/me)
+ * Hook de sesión: valida el token contra la Edge Function (GET /auth/me)
  * y expone login/logout para toda la app.
  */
 export function useAuth() {
@@ -34,7 +29,7 @@ export function useAuth() {
     api.get('/auth/me')
       .then(res => setUsuario(res.data))
       .catch(err => {
-        if (err.response?.status === 401) limpiarSesion();
+        if (err.response?.status === 401 || err.response?.status === 403) limpiarSesion();
         setUsuario(null);
       })
       .finally(() => setCargando(false));
@@ -42,8 +37,7 @@ export function useAuth() {
 
   const login = useCallback(async (email, password) => {
     const res = await api.post('/auth', { email, password });
-    localStorage.setItem(NS_TOKEN, res.data.token);
-    localStorage.setItem(NS_USUARIO, JSON.stringify(res.data.usuario));
+    guardarSesion(res.data);
     setUsuario(res.data.usuario);
     return res.data.usuario;
   }, []);

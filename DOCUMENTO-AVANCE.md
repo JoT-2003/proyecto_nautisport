@@ -1,7 +1,9 @@
 # 📄 Documento de Avance — Proyecto Nautisport
 
-> **Última actualización:** sesión de desarrollo del 17/11/2026
+> **Última actualización:** sesión de desarrollo del 23/11/2026
 > **Objetivo del documento:** registrar todo lo avanzado, lo pendiente y el punto exacto de retomada para la próxima sesión.
+>
+> **Arquitectura vigente:** frontend en Vercel + **Supabase Auth** (login) + **Supabase Edge Function `api`** (backend) + PostgreSQL de Supabase. Ya no se despliega Express/Render. La guía paso a paso está en [`README.md`](README.md).
 
 ---
 
@@ -16,7 +18,7 @@ Recepción del equipo (cliente + equipo + servicios)  →  Orden de Trabajo (OT)
   → Finalizado → Entregado
 ```
 
-**Stack:** PostgreSQL + Express (Node) + Next.js 16 (React 19) + Tailwind 4 + Axios.
+**Stack:** PostgreSQL (Supabase) + Supabase Auth + Supabase Edge Functions (Deno) + Next.js 16 (React 19) + Tailwind 4 + Axios.
 
 ---
 
@@ -208,6 +210,15 @@ Entregado → (estado final, sin cambios)
 - [x] Se quitó una contraseña real que estaba expuesta en `nautisport-backend/.env.example` (ahora placeholders)
 - [ ] **Pendiente de ejecutar:** requiere la connection string del proyecto Supabase del usuario; una vez entregada se corre `npm run migrate:supabase` y `npm run verify:supabase`
 
+### Fase 10 — Backend y login dentro de Supabase (23/11/2026)
+- [x] Login migrado a **Supabase Auth**: los usuarios demo se crean con `npm run seed:auth` y se enlazan a `public.usuario.auth_id`.
+- [x] Backend Express portado a una **Edge Function** (`supabase/functions/api/index.ts`) con todos los endpoints: auth, clientes, servicios, órdenes, estados, servicios de OT y borrado.
+- [x] Esquema definitivo idempotente en `supabase/migrations/20261123000000_nautisport_supabase.sql`: `auth_id`, RLS, permisos bloqueados para `anon`/`authenticated`, triggers y secuencias.
+- [x] Frontend con refresh automático de sesión (`src/lib/sesion.js` + interceptor en `src/services/api.js`).
+- [x] Guía única de despliegue en `README.md` (Supabase SQL Editor + Edge Function + Vercel).
+- [x] Probado localmente de punta a punta con un mock de Supabase Auth y PostgreSQL: login, refresh, permisos por rol, CRUD, folio, estados, sobrecostos, historial y borrado en cascada.
+- [ ] **Pendiente de ejecutar por el usuario:** aplicar el SQL en su proyecto, correr `npm run seed:auth`, desplegar la función `api` con **Verify JWT desactivado** y configurar `NEXT_PUBLIC_API_URL` en Vercel.
+
 ### Mejoras adicionales registradas (no bloquean)
 - [ ] `npm audit` reporta 16 vulnerabilidades en dependencias transitivas del frontend (6 backend). Revisar con calma; **no usar `--force`**
 - [ ] Considerar campo de fotos/estado del equipo en la recepción si el documento del taller lo exige (ver `Taller Sist avance 1.pdf`)
@@ -225,15 +236,17 @@ Entregado → (estado final, sin cambios)
    - Recepción/Admin: aprobar o rechazar sobrecosto → entregar equipo → imprimir comanda
    - Admin: eliminar una OT de prueba desde la tabla o el detalle
 3. **Usar las cuentas demo** (botón "Usar" en el login): `admin@` / `recepcion@` / `tecnico@nautisport.cl`, contraseña `nautisport123`
-4. **Antes de presentar**, confirmar `http://localhost:4000/api/health` → `{"estado":"ok","base_datos":"conectada"}`
+4. **Antes de presentar**, confirmar `https://TU_PROYECTO.supabase.co/functions/v1/api/health` → `{"estado":"ok","base_datos":"conectada","backend":"supabase-edge"}`
 
 ---
 
 ## 6. 🚀 Cómo levantar el proyecto (recordatorio)
 
+> Para la demo en producción sigue [`README.md`](README.md): Supabase (SQL + Auth + Edge Function) y Vercel. Lo de abajo queda como referencia del entorno local antiguo.
+
 **Base de datos:** ejecutar `nautisport-backend/scripts/ddl triggers.sql` en PostgreSQL si la BD no existe aún (crea tablas, enums, triggers y catálogo de servicios).
 
-**Backend:**
+**Backend local (legacy, ya no se despliega):**
 ```bash
 cd nautisport-backend
 # copiar .env.example → .env y poner la contraseña real de PostgreSQL en DATABASE_URL

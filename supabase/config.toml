@@ -1,0 +1,8 @@
+# Configuración mínima para desplegar la Edge Function con Supabase CLI.
+# El login y el refresh son públicos (no traen JWT todavía), por eso la
+# función "api" debe desactivar la verificación automática del gateway.
+# La función valida el JWT por su cuenta en las rutas protegidas.
+project_id = "nautisport"
+
+[functions.api]
+verify_jwt = false

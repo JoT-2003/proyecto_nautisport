@@ -1,11 +1,44 @@
 import axios from 'axios';
-import { NS_TOKEN } from '@/hooks/useAuth';
+import {
+  NS_TOKEN,
+  NS_REFRESH,
+  guardarSesion,
+  limpiarSesion,
+} from '@/lib/sesion';
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
-});
+// En producción debe apuntar a la Edge Function de Supabase:
+//   https://TU_PROYECTO.supabase.co/functions/v1/api
+// En desarrollo, si no hay variable, usa el backend Express local.
+const baseURL = (
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === 'development' ? 'http://localhost:4000/api' : '')
+).replace(/\/+$/, '');
 
-// Adjunta el token JWT a todas las peticiones (si hay sesión activa)
+const api = axios.create({ baseURL });
+
+// Evita que varias peticiones simultáneas disparen varios refresh.
+let refrescoEnCurso = null;
+
+async function refrescarSesion() {
+  if (refrescoEnCurso) return refrescoEnCurso;
+
+  const refreshToken = localStorage.getItem(NS_REFRESH);
+  if (!refreshToken) throw new Error('No hay refresh token');
+
+  refrescoEnCurso = axios
+    .post(`${baseURL}/auth/refresh`, { refresh_token: refreshToken })
+    .then(({ data }) => {
+      guardarSesion(data);
+      return data.token;
+    })
+    .finally(() => {
+      refrescoEnCurso = null;
+    });
+
+  return refrescoEnCurso;
+}
+
+// Adjunta el token JWT de Supabase a todas las peticiones.
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem(NS_TOKEN);
@@ -16,21 +49,35 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Ante un 401 (sesión expirada/inválida) redirige al login.
-// Se excluyen las llamadas a /auth para no redirigir en un login fallido.
+// Ante un 401 intenta renovar la sesión una vez y reintenta la petición.
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    const esLlamadaAuth = error.config?.url?.includes('/auth');
-    if (
-      typeof window !== 'undefined' &&
-      error.response?.status === 401 &&
-      !esLlamadaAuth &&
-      !window.location.pathname.startsWith('/login')
-    ) {
-      localStorage.removeItem(NS_TOKEN);
-      window.location.href = '/login';
+  async (error) => {
+    const original = error.config;
+    // Solo el POST /auth (login) queda fuera del refresh. /auth/me sí debe
+    // intentar renovar el token cuando la sesión está vencida.
+    const esLogin = original?.url?.split('?')[0] === '/auth';
+    const es401 = error.response?.status === 401;
+
+    if (es401 && !esLogin && !original?._reintento && typeof window !== 'undefined') {
+      original._reintento = true;
+      try {
+        const nuevoToken = await refrescarSesion();
+        original.headers = original.headers || {};
+        original.headers.Authorization = `Bearer ${nuevoToken}`;
+        return api(original);
+      } catch {
+        // Si el refresh falla, la sesión ya no sirve.
+      }
     }
+
+    if (es401 && !esLogin && typeof window !== 'undefined') {
+      limpiarSesion();
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
+    }
+
     return Promise.reject(error);
   }
 );

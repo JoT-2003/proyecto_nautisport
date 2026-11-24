@@ -7,6 +7,10 @@
     "dev": "nodemon index.js",
     "start": "node index.js",
     "seed": "node scripts/seed_usuario.js",
+    "db:supabase": "node scripts/supabase/aplicar-esquema.js",
+    "seed:auth": "node scripts/supabase/crear-usuarios-auth.js",
+    "setup:supabase": "node scripts/supabase/aplicar-esquema.js && node scripts/supabase/crear-usuarios-auth.js",
+    "deploy:supabase": "node scripts/supabase/desplegar-edge-function.js",
     "migrate:supabase": "node scripts/supabase/migrar-a-supabase.js",
     "verify:supabase": "node scripts/supabase/migrar-a-supabase.js --verificar",
     "test": "echo \"Error: no test specified\" && exit 1"
