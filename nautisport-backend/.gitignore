@@ -1,0 +1,11 @@
+# Variables de entorno — NautiSport
+
+# Archivos con credenciales reales: NUNCA subirlos a Git
+.env
+.env.local
+.env.supabase
+.env.production
+
+# Dependencias y build
+node_modules/
+.next/
