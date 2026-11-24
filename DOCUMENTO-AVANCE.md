@@ -116,7 +116,7 @@ Proyecto-Nautisport-main/
 - [x] **Servicios a la OT:** `POST /api/ordenes/:id/servicios` (catálogo usa `precio_base`; custom = sobrecosto por defecto; sobrecosto → estado "Requiere Autorización" automático)
 - [x] **Catálogo:** `PUT /api/servicios/:id` protegido con JWT + rol Administrador (primer endpoint con RBAC)
 - [x] **Middleware** `middleware/auth.js`: `autenticar` + `requireRole` (listo para aplicar en Fase 5)
-- [x] **Seed:** `scripts/seed_usuario.js` — 3 usuarios demo, contraseña `nautisport123`:
+- [x] **Seed:** `scripts/seed_usuario.js` — 3 usuarios demo (contraseña definida en `DEMO_PASSWORD`, nunca en el repo):
   - `admin@nautisport.cl` (Administrador) · `recepcion@nautisport.cl` (Recepcion) · `tecnico@nautisport.cl` (Tecnico)
 - [x] `GET /api/health` para verificar servidor + BD
 - [x] Sintaxis verificada con `node --check` en todos los archivos
@@ -235,7 +235,7 @@ Entregado → (estado final, sin cambios)
    - Técnico: iniciar mantención → agregar servicio/sobrecosto → finalizar
    - Recepción/Admin: aprobar o rechazar sobrecosto → entregar equipo → imprimir comanda
    - Admin: eliminar una OT de prueba desde la tabla o el detalle
-3. **Usar las cuentas demo** (botón "Usar" en el login): `admin@` / `recepcion@` / `tecnico@nautisport.cl`, contraseña `nautisport123`
+3. **Ingresar con las cuentas demo** (sin botón de credenciales en el login, desde "Usar" en el login): `admin@` / `recepcion@` / `tecnico@nautisport.cl`, contraseña privada definida en `DEMO_PASSWORD`
 4. **Antes de presentar**, confirmar `https://TU_PROYECTO.supabase.co/functions/v1/api/health` → `{"estado":"ok","base_datos":"conectada","backend":"supabase-edge"}`
 
 ---
@@ -288,7 +288,7 @@ psql -U postgres -d nautisport_db -f scripts/migracion_folio_automatico.sql
 1. **`.env` del backend ya existe** con `DATABASE_URL`, `PORT` y `JWT_SECRET`. No subirlo a Git si se inicializa el repositorio (contiene credenciales locales).
 2. **Catálogo con precios reales**: se carga con `scripts/migracion_servicios.sql` (ver sección 6). Si no se aplica la migración, recepción no verá los servicios nuevos y los montos seguirán en $0.
 3. El proyecto **no está en Git** — recomendable iniciar un repositorio antes de seguir (permite volver atrás si algo se rompe).
-4. La tabla `usuario` requiere el seed para poder hacer login (no hay usuarios por defecto en la BD). **Credenciales demo listas**: `admin@nautisport.cl`, `recepcion@nautisport.cl`, `tecnico@nautisport.cl` — contraseña `nautisport123`.
+4. La tabla `usuario` requiere el seed para poder hacer login (no hay usuarios por defecto en la BD). **Cuentas demo listas**: `admin@nautisport.cl`, `recepcion@nautisport.cl`, `tecnico@nautisport.cl` — contraseña privada en `DEMO_PASSWORD`.
 5. Los triggers de la BD recalculan los montos (`fn_actualizar_totales_ot`) y registran el historial (`fn_registrar_cambio_estado`) — **no duplicar esa lógica** en el frontend/backend.
 6. El historial guarda el técnico desde `id_tecnico_asignado` — al cambiar a "En Mantención" conviene asignar técnico en el mismo PATCH.
 7. ~~En la Fase 5, al aplicar JWT a los endpoints existentes, el formulario de Recepción dejará de funcionar si el frontend no manda el token — hacer ambos cambios en la misma sesión.~~ **Resuelto en Fase 5:** backend y frontend se actualizaron juntos; todas las peticiones ya incluyen el token automáticamente.

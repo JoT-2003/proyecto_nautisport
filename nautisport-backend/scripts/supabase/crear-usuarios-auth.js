@@ -31,7 +31,11 @@ const DATABASE_URL =
   process.env.DATABASE_URL_SUPABASE ||
   process.env.SUPABASE_DB_URL;
 
-const PASSWORD_DEMO = 'nautisport123';
+const PASSWORD_DEMO = process.env.DEMO_PASSWORD;
+if (!PASSWORD_DEMO) {
+  console.error('❌ Define DEMO_PASSWORD en nautisport-backend/.env.supabase antes de crear usuarios.');
+  process.exit(1);
+}
 
 const USUARIOS = [
   { nombre: 'Administrador NautiSport', email: 'admin@nautisport.cl', rol: 'Administrador' },

@@ -175,13 +175,16 @@ NEXT_PUBLIC_API_URL=https://TU_PROYECTO.supabase.co/functions/v1/api
 
 ---
 
-## Credenciales que quedan en Supabase Auth
+## Cuentas que quedan en Supabase Auth
 
-| Rol | Correo | Contraseña |
-|---|---|---|
-| Administrador | `admin@nautisport.cl` | `nautisport123` |
-| Recepción | `recepcion@nautisport.cl` | `nautisport123` |
-| Técnico | `tecnico@nautisport.cl` | `nautisport123` |
+| Rol | Correo |
+|---|---|
+| Administrador | `admin@nautisport.cl` |
+| Recepción | `recepcion@nautisport.cl` |
+| Técnico | `tecnico@nautisport.cl` |
+
+La contraseña se define en `DEMO_PASSWORD` dentro de `.env.supabase` y no se
+sube al repositorio. El login de la web no muestra credenciales.
 
 ---
 

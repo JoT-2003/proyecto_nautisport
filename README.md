@@ -63,19 +63,23 @@ cd nautisport-backend
 npm run seed:auth
 ```
 
-Esto crea/actualiza en **Supabase Auth**:
+Esto crea/actualiza en **Supabase Auth** estos tres correos:
 
-| Rol | Correo | Contraseña |
-|---|---|---|
-| Administrador | `admin@nautisport.cl` | `nautisport123` |
-| Recepción | `recepcion@nautisport.cl` | `nautisport123` |
-| Técnico | `tecnico@nautisport.cl` | `nautisport123` |
+| Rol | Correo |
+|---|---|
+| Administrador | `admin@nautisport.cl` |
+| Recepción | `recepcion@nautisport.cl` |
+| Técnico | `tecnico@nautisport.cl` |
+
+La contraseña **no va en el repositorio**: defínela en `.env.supabase` con
+`DEMO_PASSWORD=...` antes de correr el script, y compártela solo con quienes
+deban entrar. El login no muestra ninguna credencial.
 
 y enlaza cada usuario de Auth con su fila de `public.usuario` (donde está el rol).
 
 > Alternativa sin script: crea los 3 usuarios en **Authentication → Users**
-> con esos correos y contraseñas, marcando “Auto Confirm”. El rol ya está
-> preparado en `public.usuario` y se enlaza solo en el primer login.
+> con esos correos y la contraseña elegida, marcando “Auto Confirm”. El rol ya
+> está preparado en `public.usuario` y se enlaza solo en el primer login.
 
 ## 3. Backend (Edge Function en Supabase)
 
@@ -141,9 +145,9 @@ apuntando a la URL anterior (o a `localhost`).
 ## 5. Probar
 
 1. Abre `https://proyecto-nautisport.vercel.app/login`.
-2. Usa el botón **Usar** de cualquiera de los 3 usuarios demo.
-3. Contraseña: `nautisport123`.
-4. Prueba el flujo completo: Recepción crea OT → Técnico avanza estados →
+2. Ingresa con uno de los correos demo y la contraseña que definiste
+   en `DEMO_PASSWORD` (el login no muestra credenciales).
+3. Prueba el flujo completo: Recepción crea OT → Técnico avanza estados →
    Recepción entrega → Admin elimina una OT de prueba.
 
 ## 6. Checklist

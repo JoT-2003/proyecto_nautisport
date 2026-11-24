@@ -11,7 +11,11 @@ const USUARIOS = [
   { nombre: 'Técnico NautiSport', email: 'tecnico@nautisport.cl', rol: 'Tecnico' },
 ];
 
-const PASSWORD_DEMO = 'nautisport123';
+const PASSWORD_DEMO = process.env.DEMO_PASSWORD;
+if (!PASSWORD_DEMO) {
+  console.error('❌ Define DEMO_PASSWORD en nautisport-backend/.env antes de crear usuarios.');
+  process.exit(1);
+}
 
 (async () => {
   const hash = await bcrypt.hash(PASSWORD_DEMO, 10);
