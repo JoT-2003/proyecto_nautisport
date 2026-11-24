@@ -164,7 +164,21 @@ async function verificarLogin(usuario) {
     process.exit(1);
   }
 
-  const db = new Client({ connectionString: DATABASE_URL });
+  // Quita sslmode para que pg no exija verify-full (antivirus/proxies en Windows).
+  const sinSslMode = (() => {
+    try {
+      const u = new URL(DATABASE_URL);
+      u.searchParams.delete('sslmode');
+      return u.toString();
+    } catch {
+      return DATABASE_URL;
+    }
+  })();
+
+  const db = new Client({
+    connectionString: sinSslMode,
+    ssl: { rejectUnauthorized: false },
+  });
   await db.connect();
 
   try {

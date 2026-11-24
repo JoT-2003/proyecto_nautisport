@@ -85,7 +85,20 @@ function obtenerDDL() {
 
 async function conectar(url, nombre) {
   if (!url) throw new Error(`Falta la cadena de conexión ${nombre}. Revisa .env / .env.supabase`);
-  const client = new Client({ connectionString: url });
+  const sinSslMode = (() => {
+    try {
+      const u = new URL(url);
+      u.searchParams.delete('sslmode');
+      return u.toString();
+    } catch {
+      return url;
+    }
+  })();
+
+  const client = new Client({
+    connectionString: sinSslMode,
+    ssl: { rejectUnauthorized: false },
+  });
   await client.connect();
   await client.query("SET client_encoding = 'UTF8'");
   return client;

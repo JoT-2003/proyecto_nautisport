@@ -107,8 +107,13 @@ npx supabase login
 npm run deploy:supabase
 ```
 
-`deploy:supabase` toma el project ref desde `SUPABASE_URL` y despliega la
-función con `--no-verify-jwt`. También puedes hacerlo a mano:
+Si no puedes abrir el navegador, crea un **Personal Access Token** en
+https://supabase.com/dashboard/account/tokens, agrégalo a `.env.supabase` como
+`SUPABASE_ACCESS_TOKEN=sbp_...` y ejecuta `npm run deploy:supabase`.
+
+`deploy:supabase` toma el project ref desde `SUPABASE_URL`, despliega la
+función con `--no-verify-jwt` y comprueba `/health` automáticamente. También
+puedes hacerlo a mano:
 
 ```powershell
 npx supabase functions deploy api --project-ref TU_PROYECTO --no-verify-jwt

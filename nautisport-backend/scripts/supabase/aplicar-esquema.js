@@ -30,7 +30,21 @@ const ARCHIVO = path.join(RAIZ, 'supabase/migrations/20261123000000_nautisport_s
   const sql = fs.readFileSync(ARCHIVO, 'utf8');
   console.log('Aplicando esquema NautiSport a Supabase...\n');
 
-  const db = new Client({ connectionString: DATABASE_URL });
+  // Quita sslmode para que pg no exija verify-full (antivirus/proxies en Windows).
+  const sinSslMode = (() => {
+    try {
+      const u = new URL(DATABASE_URL);
+      u.searchParams.delete('sslmode');
+      return u.toString();
+    } catch {
+      return DATABASE_URL;
+    }
+  })();
+
+  const db = new Client({
+    connectionString: sinSslMode,
+    ssl: { rejectUnauthorized: false },
+  });
   await db.connect();
   try {
     await db.query("SET client_encoding = 'UTF8'");

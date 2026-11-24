@@ -110,6 +110,19 @@ function validarDbUrl(valor, refEsperado) {
   return { valor: v };
 }
 
+// pg interpreta sslmode=require como verify-full y falla con los certificados
+// que inyectan algunos antivirus/proxies en Windows. Para los scripts locales
+// quitamos ese parámetro y usamos ssl: { rejectUnauthorized: false }.
+function cadenaSinSslMode(cadena) {
+  try {
+    const u = new URL(cadena);
+    u.searchParams.delete('sslmode');
+    return u.toString();
+  } catch {
+    return cadena;
+  }
+}
+
 function enmascarar(valor) {
   if (!valor) return '(vacío)';
   if (valor.length <= 14) return valor;
@@ -208,7 +221,13 @@ async function probarConexiones({ url, anon, service, db }) {
   let cliente;
   try {
     const { Client } = require('pg');
-    cliente = new Client({ connectionString: db, connectionTimeoutMillis: 20000 });
+    // rejectUnauthorized: false evita fallos con antivirus/proxies que
+    // interceptan TLS en Windows. La conexión sigue cifrada.
+    cliente = new Client({
+      connectionString: cadenaSinSslMode(db),
+      ssl: { rejectUnauthorized: false },
+      connectionTimeoutMillis: 20000,
+    });
     await cliente.connect();
     await cliente.query('SELECT 1');
     console.log('  ✔ Conexión a PostgreSQL correcta');
