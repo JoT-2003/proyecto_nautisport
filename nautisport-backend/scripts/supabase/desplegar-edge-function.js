@@ -61,14 +61,15 @@ async function verificarSalud() {
   }
 
   console.log(`Desplegando Edge Function "api" en el proyecto ${ref}...\n`);
-  if (!ACCESS_TOKEN) {
-    console.log('No hay SUPABASE_ACCESS_TOKEN en .env.supabase.');
-    console.log('Si el comando falla, ejecuta antes en tu terminal: npx supabase login\n');
+  if (ACCESS_TOKEN) {
+    console.log('Usando SUPABASE_ACCESS_TOKEN de .env.supabase.\n');
+  } else {
+    console.log('Usando la sesión de la CLI (npx supabase login).\n');
   }
 
   const resultado = spawnSync(
     'npx',
-    ['supabase', 'functions', 'deploy', 'api', '--project-ref', ref, '--no-verify-jwt'],
+    ['supabase', 'functions', 'deploy', 'api', `--remote=${ref}`, '--no-verify-jwt', '--yes'],
     { cwd: RAIZ, stdio: 'inherit', shell: true, env: process.env }
   );
 
