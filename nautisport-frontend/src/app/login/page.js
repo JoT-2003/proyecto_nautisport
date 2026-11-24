@@ -47,7 +47,7 @@ export default function LoginPage() {
       setError(
         err.response?.data?.error ||
         (!err.response
-          ? 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo en el puerto 4000.'
+          ? 'No se pudo conectar con el servidor. Verifica que el backend esté disponible y que NEXT_PUBLIC_API_URL apunte a su URL.'
           : 'No se pudo iniciar sesión')
       );
       setEnviando(false);
