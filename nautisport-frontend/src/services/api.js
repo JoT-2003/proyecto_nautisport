@@ -14,6 +14,14 @@ const baseURL = (
   (process.env.NODE_ENV === 'development' ? 'http://localhost:4000/api' : '')
 ).replace(/\/+$/, '');
 
+if (!baseURL && typeof window !== 'undefined') {
+  console.error(
+    '[NautiSport] Falta NEXT_PUBLIC_API_URL. Configura en Vercel la URL de la ' +
+      'Edge Function (https://TU_PROYECTO.supabase.co/functions/v1/api) y ' +
+      'vuelve a desplegar.'
+  );
+}
+
 const api = axios.create({ baseURL });
 
 // Evita que varias peticiones simultáneas disparen varios refresh.

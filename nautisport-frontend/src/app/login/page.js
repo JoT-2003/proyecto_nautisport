@@ -5,14 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Input, Button } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 
-// Usuarios creados por scripts/seed_usuario.js (solo para la demo)
-const DEMO_USUARIOS = [
-  { rol: 'Administrador', email: 'admin@nautisport.cl' },
-  { rol: 'Recepción', email: 'recepcion@nautisport.cl' },
-  { rol: 'Técnico', email: 'tecnico@nautisport.cl' },
-];
-const DEMO_PASSWORD = 'nautisport123';
-
 export default function LoginPage() {
   const router = useRouter();
   const { usuario, cargando, login } = useAuth();
@@ -29,13 +21,6 @@ export default function LoginPage() {
     }
   }, [cargando, usuario, router]);
 
-  // Rellena el formulario con una cuenta de demostración
-  const usarDemo = (email) => {
-    setEmail(email);
-    setPassword(DEMO_PASSWORD);
-    setError(null);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setEnviando(true);
@@ -44,11 +29,12 @@ export default function LoginPage() {
       await login(email, password);
       router.replace('/');
     } catch (err) {
+      console.error('Error de login:', err);
       setError(
         err.response?.data?.error ||
         (!err.response
-          ? 'No se pudo conectar con el servidor. Verifica que la Edge Function "api" esté desplegada en Supabase y que NEXT_PUBLIC_API_URL apunte a ella.'
-          : 'No se pudo iniciar sesión')
+          ? 'No se pudo conectar con el servidor. Revisa tu conexión e intenta nuevamente.'
+          : 'No se pudo iniciar sesión. Verifica tu correo y contraseña.')
       );
       setEnviando(false);
     }
@@ -97,32 +83,6 @@ export default function LoginPage() {
           <Button type="submit" loading={enviando} className="w-full">
             Entrar
           </Button>
-
-          {/* Credenciales de demostración (clic para rellenar el formulario) */}
-          <div className="bg-gray-50 border border-gray-300 rounded p-3 text-xs text-gray-700">
-            <p className="font-bold uppercase text-gray-800 mb-2">Usuarios de demostración</p>
-            <div className="space-y-1">
-              {DEMO_USUARIOS.map((u) => (
-                <button
-                  key={u.email}
-                  type="button"
-                  onClick={() => usarDemo(u.email)}
-                  className="w-full flex items-center justify-between gap-2 text-left px-2 py-1.5 rounded border border-transparent hover:border-black hover:bg-white transition-colors"
-                >
-                  <span>
-                    <span className="font-bold text-black">{u.rol}</span>
-                    <span className="block text-gray-600">{u.email}</span>
-                  </span>
-                  <span className="font-bold uppercase text-[10px] bg-black text-white px-2 py-1 rounded shrink-0">
-                    Usar
-                  </span>
-                </button>
-              ))}
-            </div>
-            <p className="mt-2">
-              Contraseña para todos: <span className="font-mono font-bold">{DEMO_PASSWORD}</span>
-            </p>
-          </div>
         </form>
       </div>
     </div>

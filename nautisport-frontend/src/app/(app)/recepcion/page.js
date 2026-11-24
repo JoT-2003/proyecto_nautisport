@@ -365,7 +365,7 @@ export default function RecepcionPage() {
             {errorServicios ? (
               <p className="text-red-600 font-bold text-sm bg-red-50 p-3 rounded border border-red-300">
                 <i className="fa-solid fa-triangle-exclamation mr-1" aria-hidden="true" />
-                No se pudo conectar con el servidor backend (puerto 4000). Asegúrate de tener corriendo 'npx nodemon index.js'.
+                No se pudo cargar el catálogo de servicios. Revisa tu conexión e intenta nuevamente.
               </p>
             ) : cargandoServicios ? (
               <p className="text-gray-700 font-semibold text-sm">Cargando catálogo de servicios desde la base de datos...</p>

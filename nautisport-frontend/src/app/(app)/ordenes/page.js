@@ -178,7 +178,7 @@ export default function OrdenesPage() {
       {error && (
         <div className="mb-6 p-4 rounded bg-red-100 text-red-900 font-bold border border-red-400">
           <i className="fa-solid fa-triangle-exclamation mr-2" aria-hidden="true" />
-          No se pudo conectar con el servidor backend (puerto 4000). Asegúrate de tener corriendo 'npm run dev' en nautisport-backend.
+          No se pudo conectar con el servidor. Revisa tu conexión e intenta nuevamente.
         </div>
       )}
 
