@@ -24,11 +24,14 @@ La vía rápida (hace el SQL y los usuarios de una vez):
 
 ```powershell
 cd nautisport-backend
-Copy-Item .env.supabase.example .env.supabase
-notepad .env.supabase        # completa URL, claves y connection string
 npm install
+npm run config:supabase      # asistente: pide y valida URL, claves y cadena
 npm run setup:supabase       # aplica el esquema + crea usuarios demo
 ```
+
+`config:supabase` prueba la URL, las dos claves y la conexión a PostgreSQL antes
+de guardar. Si prefieres editar a mano, copia `.env.supabase.example` como
+`.env.supabase`, complétalo y verifica con `npm run check:supabase`.
 
 Si prefieres hacerlo desde el dashboard, ejecuta en **SQL Editor** el archivo
 `supabase/migrations/20261123000000_nautisport_supabase.sql` y después

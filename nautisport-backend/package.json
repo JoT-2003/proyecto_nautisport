@@ -7,6 +7,8 @@
     "dev": "nodemon index.js",
     "start": "node index.js",
     "seed": "node scripts/seed_usuario.js",
+    "config:supabase": "node scripts/supabase/configurar.js",
+    "check:supabase": "node scripts/supabase/configurar.js --check",
     "db:supabase": "node scripts/supabase/aplicar-esquema.js",
     "seed:auth": "node scripts/supabase/crear-usuarios-auth.js",
     "setup:supabase": "node scripts/supabase/aplicar-esquema.js && node scripts/supabase/crear-usuarios-auth.js",
