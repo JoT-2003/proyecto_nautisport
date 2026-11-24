@@ -25,6 +25,9 @@ dist/
 # Volcado de BD con datos reales (se regenera con: npm run migrate:supabase -- --generar-sql)
 migracion_supabase.sql
 
+# Archivos temporales de Supabase CLI
+supabase/.temp/
+
 # Logs y sistema operativo
 *.log
 npm-debug.log*
